@@ -1,9 +1,9 @@
-import random
 from PIL import Image
+import random
 
 # PokemonGO Local
 # Estructura básica para el proyecto
-# Los códigos de estado son representativos para el proyecto final
+# Los códigos y los estados son representativos para el proyecto final
 
 # Códigos de estado del cliente
 # 10 Solicita al servidor por parte del cliente
@@ -26,7 +26,6 @@ stateCode30 = 30
 stateCode31 = 31
 # 32 Terminando sesion 
 stateCode32 = 32
-
 
 print("Pokemon GO\n")
 
@@ -62,14 +61,21 @@ idPokemon = random.randrange(len(pokemonArray))
 # Número de intentos para atrapar un Pokemon
 attemptNumber = 3
 
+# Estado s0
+# Estado inicial, desde aquí iniciara la conexión del protocolo de la 
+# capa de aplicación.
 def s0():
     print("Inicia la conexión del protocolo de la capa de aplicación")
     return s1(stateCode10)
 
+# Estado s1
+# Recibe solicitud del cliente, ofrece aleatoriamente un Pokemon para capturar.
 def s1(stateCode):
     print("¡Un " + pokemonArray[idPokemon] + " salvaje ha aparecido!")
     return s2(stateCode20)
 
+# Estado s2
+# Indica si quiere capturar o no el Pokemon ofrecido.
 def s2(stateCode):
     usrInput = input("¿Deseas capturarlo? [Si/No] ")
     usrInput = usrInput.upper()
@@ -86,20 +92,25 @@ def s2(stateCode):
         # Estado de error
         return s6(0)
 
+# Estado s3
+# Usa el contador como el máximo número de intentos. Aleatoriamente indica
+# si se capturó al Pokemon o no.
 def s3(stateCode):
     global attemptNumber
     attemptNumber -= 1
     # Si se acaban los intentos pasa al estado 6
     if(attemptNumber == 0):
         return s6(stateCode23)
-    # Si se captura va al s5
+    # Decide aleatoriamente si se captura el Pokemón o no
+    # Si se captura va al estado 5
     elif(random.choice([True, False])):
-        #print("Esto es verdadero")
         return s5(stateCode22, idPokemon)
     # En otro caso va al s4
     else:
         return s4(stateCode21, idPokemon, attemptNumber)
 
+# Estado s4
+# Da respuesta para reintentar captura de Pokemon.
 def s4(stateCode, idPokemon, numAttempts):
     usrInput = input("Intentar capturar de nuevo? Quedan " 
     + str(numAttempts) + " intento(s) ")
@@ -118,10 +129,12 @@ def s4(stateCode, idPokemon, numAttempts):
         return s6(0)
 
 # Estado s5
-# Se recibe el pokemon capturado y envía la imagen
+# Se recibe el pokemon capturado y envía la imagen.
 def s5(stateCode, idPokemon):
     print("Has capturado a " + pokemonArray[idPokemon])
-    print("Aquí debería imprimir la imagen")
+    #print("Aquí debería imprimir la imagen")
+    img = Image.open('img/'+str(idPokemon+1)+'.png')
+    img.show() 
     return s7(stateCode32)
 
 # Estado s6 
@@ -142,6 +155,5 @@ def s7(stateCode):
     print("Estado 7")
     print("Conexión terminada")
 
+# Empieza la máquina de estados
 s0()
-#img = Image.open('test.jpg')
-#img.show() 

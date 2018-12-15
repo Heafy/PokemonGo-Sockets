@@ -119,7 +119,8 @@ def s4(stateCode, idPokemon, numAttempts):
 # Estado s5
 # Se recibe el pokemon capturado y envía la imagen.
 def s5(stateCode, idPokemon):
-    print("Has capturado a " + pokemonArray[idPokemon])
+    message = "Has capturado a " + pokemonArray[idPokemon]
+    clientsocket.send(message.encode())
     #print("Aquí debería imprimir la imagen")
     #img = Image.open('img/'+str(idPokemon+1)+'.png')
     #img.show() 

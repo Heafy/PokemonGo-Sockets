@@ -2,33 +2,32 @@
 
 import socket
 
-# Método para procesar la entrada del usuario
-# La entrada solo será [SI/NO]
-# Dependiendo de la entrada devuelve el código de estado
-# En otro caso envía al estado de error
-def processInput(userInput, actualState):
-    userInput = userInput.upper()
-
 # Crea un socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 # Obtiene el nombre del equipo sobre el que se ejecuta
 host = socket.gethostname()                           
 # Puerto designado
 port = 9999
-print("Intentando conexión")
+print("Intentando conexión..")
 # Conexión del host en el puerto
 s.connect((host, port))                               
-print("¡Conectado al servidor!")
 
 # Si la conexión se establece pasa al estado 1 mediante un código 10.
-stateCodeMsg = '10'
-s.send(stateCodeMsg.encode())
+#stateCodeMsg = '10'
+#s.send(stateCodeMsg.encode())
+# Recupera los mensajes
 
-msg = s.recv(1024)
-msg = msg.decode()
-print(msg)
-usrInput = input("")
-usrInput = usrInput.upper()
+serverMessage = s.recv(1024)
+serverMessage = serverMessage.decode()
+
+while serverMessage != "SERVIDOR>>> FINALIZAR":
+    if not serverMessage:
+        break
+    print(serverMessage)
+    clientMessage = input("CLIENTE>>> ")
+    s.send(clientMessage.encode())
+    serverMessage = s.recv(1024)
+    serverMessage = serverMessage.decode()
 
 s.close()
 #print (msg.decode('ascii'))

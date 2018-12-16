@@ -5,9 +5,21 @@ import sys
 
 # Crea un socket nulo
 s = None
-print("Intentando conexión..")
+
+def processServerMessage(serverMessage):
+    serverMessage = serverMessage.decode()
+    serverMessageArr = serverMessage.split("-")
+    if(serverMessageArr[0] == "20"):
+        print("¡Un " + serverMessageArr[1] + " salvaje ha aparecido!")
+
+# Método que procesa la entrada del usuario para enviarla 
+# como códigos al servidor
+# La entrada solo debe consistir en [Si/No]
+def processClientInput(stateNumber, userInput):
+    pass
 
 def main():
+    print("Intentando conexión..")
     args = sys.argv
     # Revisa que los argumentos sean correctos
     if(len(args) != 3):
@@ -32,13 +44,18 @@ def main():
     # Conexion hacia el servidor con los parámetros dados
     try:
         s.connect((HOST, PORT))
-        # Si la conexión es exitosa envía un código 10 para iniciar 
-        # la aplicación
+        # Mensaje de confirmacion
+        serverMessage = s.recv(1024)
+        print(serverMessage.decode())
+        # Codigo 10: code
         clientMessage = "10"
         s.send(clientMessage.encode())
     except:
         print("Conexion rechazada")
         exit()
+    while True:
+        serverMessage = s.recv(1024)
+        processServerMessage(serverMessage)
 
 if __name__ == "__main__":
     main()

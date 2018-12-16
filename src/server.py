@@ -3,8 +3,19 @@ import random
 import socket  
 import _thread
 
-def catchPokemon(attemptNumber):
-    print("Método para intentar atrapar pokemones")
+def catchPokemon(clientSocket, idPokemon, numAttemps):
+    numAttemps = int(numAttemps)
+    numAttemps -= 1
+    if(numAttemps == 0):
+        serverMessage = "23"
+    # Decide aleatoriamente si se captura el Pokemón o no
+    elif(random.choice([True, False])):
+        # Código 22: code - idPokemon
+        serverMessage = "22-" + idPokemon
+    else:
+        # Código 21: code - idPokemon - numAttemps
+        serverMessage = "21-" + idPokemon + "-" + str(numAttemps)
+    clientSocket.send(serverMessage.encode())
 
 # Método para procesar los mensajes del cliente
 # Cada mensaje es una secuencia de números separados por un guión
@@ -25,11 +36,15 @@ def processClientMessage(clientSocket, clientMessage):
         print("Código 30 recibido")
         # Inicia el intento de atrapar el Pokemon con 3 intentos
         if(clientMessageArr[1] == "2"):
-            catchPokemon(3)
+            catchPokemon(clientSocket, clientMessageArr[2], clientMessageArr[3])
+        # TODO Intenta atrapar el pokemon de un intento anterior fallido
+        elif(clientMessageArr[1] == "4"):
+            catchPokemon(clientSocket, clientMessageArr[2], clientMessageArr[3])
     # Codigo 31: No quiso atrapar al pokemon
     elif(clientMessageArr[0] == "31"):
         print("Código 31 recibido")
         serverMessage = "31"
+        # TODO Hacer esto mas corto con una cadena de msg de error
         if(clientMessageArr[1] == "2"):
             serverMessage += "-2"
             print("Código 31, estado 2 enviado")

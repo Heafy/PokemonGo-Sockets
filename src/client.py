@@ -35,35 +35,52 @@ pokemonArray = ["Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon",
 def processServerMessage(serverMessage):
     serverMessage = serverMessage.decode()
     serverMessageArr = serverMessage.split("-")
-    print(serverMessage)
     if(serverMessageArr[0] == "20"):
         idPokemon = int(serverMessageArr[1])
         print("¡Un " + pokemonArray[idPokemon] + " salvaje ha aparecido!")
         print("¿Deseas capturarlo? [Si/No] ")
-        processClientInput(2)
-    elif(serverMessage[0] == "31"):
+        processClientInput(2, idPokemon, None)
+    # TODO
+    elif(serverMessageArr[0] == "21"):
+        numAttemps = serverMessageArr[2]
+        idPokemon = int(serverMessageArr[1])
+        print("¿Intentar capturar de nuevo?")
+        print("Quedan " + numAttemps + " intentos")
+        processClientInput(4, idPokemon, numAttemps)
+    elif(serverMessageArr[0] == "22"):
+        idPokemon = int(serverMessageArr[1])
+        print("Has capturado a " + pokemonArray[idPokemon])
+         # TODO Mostrar imagen
+    elif(serverMessageArr[0] == "23"):
+        print("Intentos agotados")
+    elif(serverMessageArr[0] == "31"):
         print("No quisiste capturar el Pokemon")
 
 # Método que procesa la entrada del usuario para enviarla 
 # como códigos al servidor
 # La entrada solo debe consistir en [Si/No]
-def processClientInput(stateNumber):
+def processClientInput(stateNumber, idPokemon, numAttemps):
     userInput = input(">")
     userInput = userInput.upper()
     if(userInput == "SI" or userInput == "S"):
         # Codigo 30: Dirige al estado 3
         if(stateNumber == 2):
-            clientMessage = "30-2"
+            # Código 30: code - stateNumber - idPokemon - numAttemps
+            clientMessage = "30-2-" + str(idPokemon) + "-" + str(3)
+        # TODO
+        elif(stateNumber == 4):
+            clientMessage = "30-4-" + str(idPokemon) + "-" + numAttemps
     elif(userInput == "NO" or userInput == "N"):
         # Codigo 31: Dirige al estado 6
         if(stateNumber == 2):
             clientMessage = "31-2"
+        elif(stateNumber == 4):
+            clientMessage = "31-4"
     else:
         # Estado de error
-        print("Mensaje no válido")
+        print("Respuesta no válida")
         clientMessage = "40"
     s.send(clientMessage.encode())
-
 
 def main():
     print("Intentando conexión..")

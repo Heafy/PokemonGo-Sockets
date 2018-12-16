@@ -6,17 +6,64 @@ import sys
 # Crea un socket nulo
 s = None
 
+# Los 151 Pokemon de la 1ra generación
+pokemonArray = ["Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", 
+"Charizard", "Squirtle", "Wartortle", "Blastoise", "Caterpie", "Metapod", 
+"Butterfree", "Weedle", "Kakuna", "Beedrill", "Pidgey", "Pidgeotto", "Pidgeot", 
+"Rattata", "Raticate", "Spearow", "Fearow", "Ekans", "Arbok", "Pikachu", 
+"Raichu", "Sandshrew", "Sandslash", "Nidoran♀", "Nidorina", "Nidoqueen", 
+"Nidoran♂", "Nidorino", "Nidoking", "Clefairy", "Clefable", "Vulpix", 
+"Ninetales", "Jigglypuff", "Wigglytuff", "Zubat", "Golbat", "Oddish", 
+"Gloom", "Vileplume", "Paras", "Parasect", "Venonat", "Venomoth", "Diglett", 
+"Dugtrio", "Meowth", "Persian", "Psyduck", "Golduck", "Mankey", "Primeape", 
+"Growlithe", "Arcanine", "Poliwag", "Poliwhirl", "Poliwrath", "Abra", 
+"Kadabra", "Alakazam", "Machop", "Machoke", "Machamp", "Bellsprout", 
+"Weepinbell", "Victreebel", "Tentacool", "Tentacruel", "Geodude", "Graveler", 
+"Golem", "Ponyta", "Rapidash", "Slowpoke", "Slowbro", "Magnemite", "Magneton", 
+"Farfetch’d", "Doduo", "Dodrio", "Seel", "Dewgong", "Grimer", "Muk", 
+"Shellder", "Cloyster", "Gastly", "Haunter", "Gengar", "Onix", "Drowzee", 
+"Hypno", "Krabby", "Kingler", "Voltorb", "Electrode", "Exeggcute", 
+"Exeggutor", "Cubone", "Marowak", "Hitmonlee", "Hitmonchan", "Lickitung", 
+"Koffing", "Weezing", "Rhyhorn", "Rhydon", "Chansey", "Tangela", "Kangaskhan", 
+"Horsea", "Seadra", "Goldeen", "Seaking", "Staryu", "Starmie", "Mime", 
+"Scyther", "Jynx", "Electabuzz", "Magmar", "Pinsir", "Tauros", "Magikarp", 
+"Gyarados", "Lapras", "Ditto", "Eevee", "Vaporeon", "Jolteon", "Flareon", 
+"Porygon", "Omanyte", "Omastar", "Kabuto", "Kabutops", "Aerodactyl", "Snorlax", 
+"Articuno", "Zapdos", "Moltres", "Dratini", "Dragonair", "Dragonite", 
+"Mewtwo", "Mew"]
+
 def processServerMessage(serverMessage):
     serverMessage = serverMessage.decode()
     serverMessageArr = serverMessage.split("-")
+    print(serverMessage)
     if(serverMessageArr[0] == "20"):
-        print("¡Un " + serverMessageArr[1] + " salvaje ha aparecido!")
+        idPokemon = int(serverMessageArr[1])
+        print("¡Un " + pokemonArray[idPokemon] + " salvaje ha aparecido!")
+        print("¿Deseas capturarlo? [Si/No] ")
+        processClientInput(2)
+    elif(serverMessage[0] == "31"):
+        print("No quisiste capturar el Pokemon")
 
 # Método que procesa la entrada del usuario para enviarla 
 # como códigos al servidor
 # La entrada solo debe consistir en [Si/No]
-def processClientInput(stateNumber, userInput):
-    pass
+def processClientInput(stateNumber):
+    userInput = input(">")
+    userInput = userInput.upper()
+    if(userInput == "SI" or userInput == "S"):
+        # Codigo 30: Dirige al estado 3
+        if(stateNumber == 2):
+            clientMessage = "30-2"
+    elif(userInput == "NO" or userInput == "N"):
+        # Codigo 31: Dirige al estado 6
+        if(stateNumber == 2):
+            clientMessage = "31-2"
+    else:
+        # Estado de error
+        print("Mensaje no válido")
+        clientMessage = "40"
+    s.send(clientMessage.encode())
+
 
 def main():
     print("Intentando conexión..")
@@ -59,9 +106,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-#print (msg.decode('ascii'))
-
-# El cliente siempre debe de estar preparado para la entrada, es su unico trabajo
-# Hacer una funcion para convertir de entrada a codigo dependiendo del estado

@@ -1,35 +1,49 @@
 #!/usr/bin/python3
 
 import socket
+import sys
 
-# Crea un socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-# Obtiene el nombre del equipo sobre el que se ejecuta
-host = socket.gethostname()                           
-# Puerto designado
-port = 9999
+# Crea un socket nulo
+s = None
 print("Intentando conexión..")
-# Conexión del host en el puerto
-s.connect((host, port))                               
 
-# Si la conexión se establece pasa al estado 1 mediante un código 10.
-#stateCodeMsg = '10'
-#s.send(stateCodeMsg.encode())
-# Recupera los mensajes
+def main():
+    args = sys.argv
+    # Revisa que los argumentos sean correctos
+    if(len(args) != 3):
+        print("Uso: python client.py <IP_SERVIDOR> <PUERTO>")
+        exit()
+    #Obtiene el host y el puerto desde los argumentos
+    HOST = args[1]
+    PORT = args[2]
+    # Intenta crear el socket
+    try:
+        global s
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+    except socket.error:
+        print("Hubo un error al crear el socket")
+        exit()
+    # Verificacion del puerto
+    PORT = int(PORT)
+    if(PORT != 9999):
+        print("El servidor no acepta conexiones por el puerto " + str(PORT))
+        print("Intenta con el 9999")
+        exit()
+    # Conexion hacia el servidor con los parámetros dados
+    try:
+        s.connect((HOST, PORT))
+        # Si la conexión es exitosa envía un código 10 para iniciar 
+        # la aplicación
+        clientMessage = "10"
+        s.send(clientMessage.encode())
+    except:
+        print("Conexion rechazada")
+        exit()
 
-serverMessage = s.recv(1024)
-serverMessage = serverMessage.decode()
+if __name__ == "__main__":
+    main()
 
-while serverMessage != "SERVIDOR>>> FINALIZAR":
-    if not serverMessage:
-        break
-    print(serverMessage)
-    clientMessage = input("CLIENTE>>> ")
-    s.send(clientMessage.encode())
-    serverMessage = s.recv(1024)
-    serverMessage = serverMessage.decode()
 
-s.close()
 #print (msg.decode('ascii'))
 
 # El cliente siempre debe de estar preparado para la entrada, es su unico trabajo

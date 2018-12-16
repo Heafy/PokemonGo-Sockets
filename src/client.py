@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from PIL import Image
 import socket
 import sys
 
@@ -32,6 +33,12 @@ pokemonArray = ["Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon",
 "Articuno", "Zapdos", "Moltres", "Dratini", "Dragonair", "Dragonite", 
 "Mewtwo", "Mew"]
 
+# Método auxiliar para enviar un Código 32
+# Envía el mensaje para terminar la conexión con el servidor
+def endConnection():
+    clientMessage = "32"
+    s.send(clientMessage.encode())
+
 def processServerMessage(serverMessage):
     serverMessage = serverMessage.decode()
     serverMessageArr = serverMessage.split("-")
@@ -40,7 +47,6 @@ def processServerMessage(serverMessage):
         print("¡Un " + pokemonArray[idPokemon] + " salvaje ha aparecido!")
         print("¿Deseas capturarlo? [Si/No] ")
         processClientInput(2, idPokemon, None)
-    # TODO
     elif(serverMessageArr[0] == "21"):
         numAttemps = serverMessageArr[2]
         idPokemon = int(serverMessageArr[1])
@@ -50,11 +56,20 @@ def processServerMessage(serverMessage):
     elif(serverMessageArr[0] == "22"):
         idPokemon = int(serverMessageArr[1])
         print("Has capturado a " + pokemonArray[idPokemon])
-         # TODO Mostrar imagen
+        # Muestra la imagen del Pokemon
+        img = Image.open('img/'+str(idPokemon+1)+'.png')
+        img.show()
+        endConnection()
     elif(serverMessageArr[0] == "23"):
         print("Intentos agotados")
+        endConnection()
     elif(serverMessageArr[0] == "31"):
         print("No quisiste capturar el Pokemon")
+        endConnection()
+    elif(serverMessageArr[0] == "32" or serverMessageArr[0] == "40"):
+        print("Fin de la conexión")
+        s.close()
+        exit()
 
 # Método que procesa la entrada del usuario para enviarla 
 # como códigos al servidor
@@ -63,11 +78,11 @@ def processClientInput(stateNumber, idPokemon, numAttemps):
     userInput = input(">")
     userInput = userInput.upper()
     if(userInput == "SI" or userInput == "S"):
+        # TODO Revisar si es necesario el estado
         # Codigo 30: Dirige al estado 3
         if(stateNumber == 2):
             # Código 30: code - stateNumber - idPokemon - numAttemps
             clientMessage = "30-2-" + str(idPokemon) + "-" + str(3)
-        # TODO
         elif(stateNumber == 4):
             clientMessage = "30-4-" + str(idPokemon) + "-" + numAttemps
     elif(userInput == "NO" or userInput == "N"):
@@ -117,6 +132,7 @@ def main():
     except:
         print("Conexion rechazada")
         exit()
+    # Se mantiene a la escucha de los mensajes del servidor
     while True:
         serverMessage = s.recv(1024)
         processServerMessage(serverMessage)

@@ -3,6 +3,7 @@ import random
 import socket  
 import _thread
 
+# Metodo para intentar atrapar un Pokemon
 def catchPokemon(clientSocket, idPokemon, numAttemps):
     numAttemps = int(numAttemps)
     numAttemps -= 1
@@ -33,11 +34,11 @@ def processClientMessage(clientSocket, clientMessage):
         clientSocket.send(serverMessage.encode())
     # Codigo 30: Si quiere atrapar al pokemon
     elif(clientMessageArr[0] == "30"):
+        # TODO Revisar si es necesario el estado
         print("Código 30 recibido")
         # Inicia el intento de atrapar el Pokemon con 3 intentos
         if(clientMessageArr[1] == "2"):
             catchPokemon(clientSocket, clientMessageArr[2], clientMessageArr[3])
-        # TODO Intenta atrapar el pokemon de un intento anterior fallido
         elif(clientMessageArr[1] == "4"):
             catchPokemon(clientSocket, clientMessageArr[2], clientMessageArr[3])
     # Codigo 31: No quiso atrapar al pokemon
@@ -52,15 +53,31 @@ def processClientMessage(clientSocket, clientMessage):
             serverMessage += "-4"
             print("Código 31, estado 4 enviado")
         clientSocket.send(serverMessage.encode())
+    elif(clientMessageArr[0] == "32"):
+        print("Código 32 recibido")
+        serverMessage = "32"
+        print("Código 32 enviado")
+        clientSocket.send(serverMessage.encode())
     # Codigo 40: Error para dirigir a estados finales
     elif(clientMessageArr[0] == "40"):
         print("Código 40 recibido")
+        serverMessage = "40"
+        clientSocket.send(serverMessage.encode())
+        clientSocket.close()
 
+# Metodo para cada thread
+# Se mantiene a la escucha de los mensajes de los clientes
 def run(clientSocket):
     while True:
-        clientMessage = clientSocket.recv(1024)
+        try:
+            clientMessage = clientSocket.recv(1024)
+        except:
+            print("Fin de la conexión")
+            break
         processClientMessage(clientSocket, clientMessage)
 
+# Metodo main
+# Inicializa el socket del servidor
 def main():
     # Crea un socket
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -73,6 +90,7 @@ def main():
     serversocket.listen(5)
 
     print("Servidor escuchando...")
+    # Mantiene el servidor en ejecución
     while True:
         # Establece una conexión
         clientSocket,addr = serversocket.accept()

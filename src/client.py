@@ -81,13 +81,13 @@ def updatePokemon(idUser, idPokemon):
                 newline = newline[:len(newline)-1]
                 newline += "-" + str(idPokemon) + "\n"
                 replace(userFile, line, newline)
-                print("Pokemones atrapados por " + str(lineArr[1]))
+                print("Pokemones atrapados por %s" % str(lineArr[1]))
                 catchedPokemon = lineArr[2].split("-")
                 for x in catchedPokemon:
                     index = int(x)
-                    print("* " + pokemonArray[index])
+                    print("* %s" % pokemonArray[index])
                 # Muestra el último Pokemon capturado
-                print("* " + pokemonArray[idPokemon])
+                print("* %s" % pokemonArray[idPokemon])
             line = fp.readline()
 
 # Método para procesar la entrada del usuario
@@ -119,18 +119,18 @@ def processServerMessage(serverMessage):
         processIdInput()
     if(serverMessageArr[0] == "20"):
         idPokemon = int(serverMessageArr[1])
-        print("¡Un " + pokemonArray[idPokemon] + " salvaje ha aparecido!")
+        print("¡Un %s salvaje ha aparecido!" % pokemonArray[idPokemon])
         print("¿Deseas capturarlo? [Si/No] ")
         processClientInput(2, idPokemon, None)
     elif(serverMessageArr[0] == "21"):
         numAttemps = serverMessageArr[2]
         idPokemon = int(serverMessageArr[1])
         print("¿Intentar capturar de nuevo?")
-        print("Quedan " + numAttemps + " intentos")
+        print("Quedan %s intento(s)" % numAttemps)
         processClientInput(4, idPokemon, numAttemps)
     elif(serverMessageArr[0] == "22"):
         idPokemon = int(serverMessageArr[1])
-        print("Has capturado a " + pokemonArray[idPokemon])
+        print("Has capturado a %s" % pokemonArray[idPokemon])
         updatePokemon(userId, idPokemon)
         # Muestra la imagen del Pokemon
         img = Image.open('img/'+str(idPokemon+1)+'.png')
@@ -191,7 +191,7 @@ def main():
     # Verificacion del puerto
     PORT = int(PORT)
     if(PORT != 9999):
-        print("El servidor no acepta conexiones por el puerto " + str(PORT))
+        print("El servidor no acepta conexiones por el puerto %d" % PORT)
         print("Intenta con el 9999")
         exit()
     # Conexion hacia el servidor con los parámetros dados

@@ -30,21 +30,17 @@ def processClientMessage(clientSocket, clientMessage):
     # Codigo 10: Solicita al servidor el inicio de la aplicación
     if(clientMessageArr[0] == "10"):
         print("Código 10 recibido")
+        # Código 5: code
         serverMessage = "5"
         clientSocket.send(serverMessage.encode())
-        # Se obtiene un id de un pokemon aleatorio
-        #idPokemon = random.randrange(151)
-        # Codigo 20: code - idPokemon
-        #serverMessage = "20-" + str(idPokemon)
-        #print("Codigo 20 enviado")
-        #clientSocket.send(serverMessage.encode())
+         print("Código 5 enviado")
     elif(clientMessageArr[0] == "5"):
         # Se obtiene un id de un pokemon aleatorio
         idPokemon = random.randrange(151)
         # Codigo 20: code - idPokemon
         serverMessage = "20-" + str(idPokemon)
-        print("Codigo 20 enviado")
         clientSocket.send(serverMessage.encode())
+        print("Codigo 20 enviado")
     # Codigo 30: Si quiere atrapar al pokemon
     elif(clientMessageArr[0] == "30"):
         print("Código 30 recibido")

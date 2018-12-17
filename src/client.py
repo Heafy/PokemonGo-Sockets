@@ -39,6 +39,8 @@ def endConnection():
     clientMessage = "32"
     s.send(clientMessage.encode())
 
+# Método para procesar los mensajes del servidor
+# Cada mensajes es una secuencia de números separados por un guión
 def processServerMessage(serverMessage):
     serverMessage = serverMessage.decode()
     serverMessageArr = serverMessage.split("-")
@@ -78,25 +80,23 @@ def processClientInput(stateNumber, idPokemon, numAttemps):
     userInput = input(">")
     userInput = userInput.upper()
     if(userInput == "SI" or userInput == "S"):
-        # TODO Revisar si es necesario el estado
         # Codigo 30: Dirige al estado 3
         if(stateNumber == 2):
             # Código 30: code - stateNumber - idPokemon - numAttemps
-            clientMessage = "30-2-" + str(idPokemon) + "-" + str(3)
+            clientMessage = "30-" + str(idPokemon) + "-" + str(3)
         elif(stateNumber == 4):
-            clientMessage = "30-4-" + str(idPokemon) + "-" + numAttemps
+            clientMessage = "30-" + str(idPokemon) + "-" + numAttemps
     elif(userInput == "NO" or userInput == "N"):
         # Codigo 31: Dirige al estado 6
-        if(stateNumber == 2):
-            clientMessage = "31-2"
-        elif(stateNumber == 4):
-            clientMessage = "31-4"
+        clientMessage = "31"
     else:
         # Estado de error
         print("Respuesta no válida")
         clientMessage = "40"
     s.send(clientMessage.encode())
 
+# Método main
+# Inicializa la conexión y pone a la escucha de los mensajes del servidor
 def main():
     print("Intentando conexión..")
     args = sys.argv

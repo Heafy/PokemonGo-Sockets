@@ -10,6 +10,8 @@ import sys
 # Crea un socket nulo
 s = None
 userId = None
+# Archivo de texto con la información de los usuarios
+userFile = "usr/users.txt"
 
 # Los 151 Pokemon de la 1ra generación
 pokemonArray = ["Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", 
@@ -45,7 +47,7 @@ def endConnection():
 
 # Método para mostrar los usuarios registrados
 def readUsers():
-    with open('users.txt') as fp:  
+    with open(userFile) as fp:  
         line = fp.readline()
         while line:
             lineArr = line.split("*")
@@ -68,7 +70,7 @@ def replace(file, oldString, newString):
 
 # Método que actualiza los Pokemons atrapados por el usuario
 def updatePokemon(idUser, idPokemon):
-     with open('users.txt') as fp:  
+     with open(userFile) as fp:  
         line = fp.readline()
         while line:
             # TODO ARREGLAR SALTOS DE LINEA AL AGREGAR POKEMON
@@ -78,7 +80,7 @@ def updatePokemon(idUser, idPokemon):
                  # Quita los saltos de linea
                 newline = newline[:len(newline)-1]
                 newline += "-" + str(idPokemon) + "\n"
-                replace("users.txt", line, newline)
+                replace(userFile, line, newline)
                 print("Pokemones atrapados por " + str(lineArr[1]))
                 catchedPokemon = lineArr[2].split("-")
                 for x in catchedPokemon:

@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 
 from PIL import Image
+from tempfile import mkstemp
+from shutil import move
+from os import fdopen, remove
 import socket
 import sys
 
 # Crea un socket nulo
 s = None
+userId = None
 
 # Los 151 Pokemon de la 1ra generación
 pokemonArray = ["Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", 
@@ -39,11 +43,78 @@ def endConnection():
     clientMessage = "32"
     s.send(clientMessage.encode())
 
+# Método para mostrar los usuarios registrados
+def readUsers():
+    with open('users.txt') as fp:  
+        line = fp.readline()
+        while line:
+            lineArr = line.split("*")
+            print(lineArr[0] + " " + lineArr[1])
+            line = fp.readline()
+
+# Método para remplazar una cadena en un archivo
+# No entiendo bien que hace, lo encontré en StackOverflow
+def replace(file, oldString, newString):
+    #Crea un archivo de usuarios temporal
+    fh, abs_path = mkstemp()
+    with fdopen(fh,'w') as new_file:
+        with open(file) as old_file:
+            for line in old_file:
+                new_file.write(line.replace(oldString, newString))
+    #Elimina el archivo actual
+    remove(file)
+    #Mueve el nuevo archivo
+    move(abs_path, file)  
+
+# Método que actualiza los Pokemons atrapados por el usuario
+def updatePokemon(idUser, idPokemon):
+     with open('users.txt') as fp:  
+        line = fp.readline()
+        while line:
+            # TODO ARREGLAR SALTOS DE LINEA AL AGREGAR POKEMON
+            lineArr = line.split("*")
+            if(str(idUser) == lineArr[0]):
+                newline = line
+                 # Quita los saltos de linea
+                newline = newline[:len(newline)-1]
+                newline += "-" + str(idPokemon) + "\n"
+                replace("users.txt", line, newline)
+                print("Pokemones atrapados por " + str(lineArr[1]))
+                catchedPokemon = lineArr[2].split("-")
+                for x in catchedPokemon:
+                    index = int(x)
+                    print("* " + pokemonArray[index])
+                # Muestra el último Pokemon capturado
+                print("* " + pokemonArray[idPokemon])
+            line = fp.readline()
+
+# Método para procesar la entrada del usuario
+def processIdInput():
+    try:
+        global userId
+        userInput = input(">")
+        userInput = int(userInput)
+        userId = userInput
+        clientMessage = "5"
+        s.send(clientMessage.encode())
+        if(userId < 1 or userId > 5):
+            print("ID no válido")
+            clientMessage = "40"
+            s.send(clientMessage.encode())
+    except:
+        print("Respuesta no válida")
+        clientMessage = "40"
+        s.send(clientMessage.encode())
+
 # Método para procesar los mensajes del servidor
 # Cada mensajes es una secuencia de números separados por un guión
 def processServerMessage(serverMessage):
     serverMessage = serverMessage.decode()
     serverMessageArr = serverMessage.split("-")
+    if(serverMessageArr[0] == "5"):
+        print("Selecciona el id de un usuario para empezar:")
+        readUsers()
+        processIdInput()
     if(serverMessageArr[0] == "20"):
         idPokemon = int(serverMessageArr[1])
         print("¡Un " + pokemonArray[idPokemon] + " salvaje ha aparecido!")
@@ -58,6 +129,7 @@ def processServerMessage(serverMessage):
     elif(serverMessageArr[0] == "22"):
         idPokemon = int(serverMessageArr[1])
         print("Has capturado a " + pokemonArray[idPokemon])
+        updatePokemon(userId, idPokemon)
         # Muestra la imagen del Pokemon
         img = Image.open('img/'+str(idPokemon+1)+'.png')
         img.show()

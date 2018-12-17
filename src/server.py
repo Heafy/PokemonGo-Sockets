@@ -27,9 +27,18 @@ def catchPokemon(clientSocket, idPokemon, numAttemps):
 def processClientMessage(clientSocket, clientMessage):
     clientMessage = clientMessage.decode()
     clientMessageArr = clientMessage.split("-")
-    # Codigo 10: Solicita al servidor un Pokemon para capturar
+    # Codigo 10: Solicita al servidor el inicio de la aplicación
     if(clientMessageArr[0] == "10"):
         print("Código 10 recibido")
+        serverMessage = "5"
+        clientSocket.send(serverMessage.encode())
+        # Se obtiene un id de un pokemon aleatorio
+        #idPokemon = random.randrange(151)
+        # Codigo 20: code - idPokemon
+        #serverMessage = "20-" + str(idPokemon)
+        #print("Codigo 20 enviado")
+        #clientSocket.send(serverMessage.encode())
+    elif(clientMessageArr[0] == "5"):
         # Se obtiene un id de un pokemon aleatorio
         idPokemon = random.randrange(151)
         # Codigo 20: code - idPokemon

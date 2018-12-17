@@ -61,7 +61,7 @@ def processClientMessage(clientSocket, clientMessage):
         print("Código 40 enviado")
         clientSocket.close()
 
-# Metodo para cada thread
+# Método para cada thread
 # Se mantiene a la escucha de los mensajes de los clientes
 def run(clientSocket):
     while True:

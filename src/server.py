@@ -33,7 +33,7 @@ def processClientMessage(clientSocket, clientMessage):
         # Código 5: code
         serverMessage = "5"
         clientSocket.send(serverMessage.encode())
-         print("Código 5 enviado")
+        print("Código 5 enviado")
     elif(clientMessageArr[0] == "5"):
         # Se obtiene un id de un pokemon aleatorio
         idPokemon = random.randrange(151)
